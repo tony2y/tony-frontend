@@ -8,11 +8,34 @@ export function fetchList(query) {
   })
 }
 
-export function userList(query) {
+export function userList(query) { // 查询用户
   return request({
     url: 'http://localhost:8081/system/user/list',
     method: 'get',
     params: query
+  })
+}
+
+export function updatePass(data) { // 修改密码
+  return request({
+    url: 'http://localhost:8081/system/user/editPwd',
+    method: 'post',
+    params: data
+  })
+}
+
+export function createUser(data) { // 新增用户
+  return request({
+    url: 'http://localhost:8081/system/user/add',
+    method: 'post',
+    params: data
+  })
+}
+
+export function removeUser(id) { // 删除用户
+  return request({
+    url: 'http://localhost:8081/system/user/remove/' + id,
+    method: 'delete'
   })
 }
 
