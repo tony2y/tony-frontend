@@ -8,6 +8,14 @@ export function fetchList(query) {
   })
 }
 
+export function loginBack(data) { // 登录
+  return request({
+    url: 'http://localhost:8081/loginIn',
+    method: 'get',
+    params: data
+  })
+}
+
 export function userList(query) { // 查询用户
   return request({
     url: 'http://localhost:8081/system/user/list',
@@ -20,6 +28,14 @@ export function updatePass(data) { // 修改密码
   return request({
     url: 'http://localhost:8081/system/user/editPwd',
     method: 'post',
+    params: data
+  })
+}
+
+export function updateStatus(data) { // 更改状态
+  return request({
+    url: 'http://localhost:8081/system/user/updateStatus',
+    method: 'put',
     params: data
   })
 }

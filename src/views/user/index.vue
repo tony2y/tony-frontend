@@ -36,12 +36,11 @@
              <el-tag v-if="scope.row.status === 1" :type="scope.row.status  | statusFilter">禁用</el-tag>
         </template> -->
           <el-switch v-model="scope.row.status" 
-           active-value = '0'
-           active-text="正常"
+           :active-value = "0"
            active-color="#13ce66" 
-           inactive-value = '1'
-           inactive-text="禁用"
+           :inactive-value = "1"
            inactive-color="#ff4949"
+           @change="changeStatus(scope.row.userId,$event)"
            >
            </el-switch>
        </template>
@@ -109,7 +108,7 @@
 </template>
 
 <script>
-  import { userList, removeUser, createUser, updatePass } from '@/api/article'  // 引入方法
+  import { userList, removeUser, createUser, updatePass,updateStatus } from '@/api/article'  // 引入方法
   import waves from '@/directive/waves' // Waves directive
   import { parseTime } from '@/utils'
   //  import { successMsg,errorMsg } from '@/utils/util'
@@ -146,8 +145,6 @@
     },
     data() {
       return {
-        value1: true,
-        value2: true,
         tableKey: 0,
         list: null,
         total: 0,
@@ -218,6 +215,23 @@
             this.listLoading = false
           }, 1.5 * 1000)
         })
+      },
+      changeStatus(id,status) { // 改变用户状态
+        this.$confirm('确认要更改用户状态?', '系统提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }).then(() => {
+          var data = {id:id,status:status}
+          updateStatus(data).then(res => {
+          if(res.data.status === 200){
+          this.$message.success(res.data.msg);
+          this.getList()
+          }else{
+          this.$message.error(res.data.msg); 
+          }
+          }) 
+        });
       },
       handleSelectionChange(val) {  // 表格复选框
         this.multipleSelection = val;
@@ -348,8 +362,8 @@
       handleDownload() {  // 导出excel按钮
         this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-          const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
+          const tHeader = ['userId', 'userName', 'phone', 'created', 'status']
+          const filterVal = ['userId', 'userName', 'phone', 'created', 'status']
           const data = this.formatJson(filterVal, this.list)
           excel.export_json_to_excel({
             header: tHeader,

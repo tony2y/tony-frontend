@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="title-container">
         <h3 class="title">
-          {{ $t('login.title') }}
+        系统登录
         </h3>
         <lang-select class="set-language" />
       </div>
@@ -14,7 +14,7 @@
         </span>
         <el-input
           v-model="loginForm.username"
-          :placeholder="$t('login.username')"
+          placeholder="请输入账号"
           name="username"
           type="text"
           auto-complete="on"
@@ -28,7 +28,7 @@
         <el-input
           v-model="loginForm.password"
           :type="passwordType"
-          :placeholder="$t('login.password')"
+          placeholder="请输入密码"
           name="password"
           auto-complete="on"
           @keyup.enter.native="handleLogin"
@@ -39,10 +39,10 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
-        {{ $t('login.logIn') }}
+     登录
       </el-button>
 
-      <div style="position:relative">
+      <!-- <div style="position:relative">
         <div class="tips">
           <span>{{ $t('login.username') }} : admin</span>
           <span>{{ $t('login.password') }} : {{ $t('login.any') }}</span>
@@ -57,20 +57,21 @@
         <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
           {{ $t('login.thirdparty') }}
         </el-button>
-      </div>
+      </div> -->
     </el-form>
 
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
+    <!-- <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
       {{ $t('login.thirdpartyTips') }}
       <br>
       <br>
       <br>
       <social-sign />
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
 <script>
+import { loginBack } from '@/api/article'  // 引入方法
 import { validUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
@@ -81,22 +82,22 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('请输入正确的用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码不能少于6位数'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '1111111'
+        username: null,
+        password: null
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -134,17 +135,28 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
-            this.loading = false
-            this.$router.push({ path: this.redirect || '/' })
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
+          // this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+             loginBack(this.loginForm).then(res => {
+              if(res.data.status === 200){
+                 this.$message.success(res.data.msg);
+                  this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+                      this.loading = false
+                        this.$router.push({
+                          path: '/user/index',
+                          // redirect: '/user/index', 
+                          // path: this.redirect
+                          })
+                      }).catch(() => {
+                          this.loading = false
+                        })
+                      }
+                      else{
+                      this.$message.error(res.data.msg);
+                      this.loading = false
+                    }
+              })
+          }
+       })
     },
     afterQRScan() {
       // const hash = window.location.hash.slice(1)
