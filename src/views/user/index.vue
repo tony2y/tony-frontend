@@ -1,5 +1,24 @@
 <template>
+
   <div class="app-container">
+    <el-row>
+      <el-col :span="3">
+        公司列表
+          <el-tree 
+           :props="defaultProps"
+           @node-click="handleNodeClick"
+           lazy
+           :load="loadTrees"
+           highlight-current
+           default-expand-all>
+        <span class="slot-t-node" slot-scope="{ node, data}">
+          <i :class="{ 'iconfont icon-wenjian4': !node.expanded, 'iconfont icon-wenjianjia_f':node.expanded}"/>
+          <span>{{ node.label }}</span>
+        </span>
+          </el-tree>
+      </el-col>
+      <el-col :span="20">
+        <el-col :span="1"><div style="background: #99a9bf;"></div></el-col>
     <div class="filter-container">
       <el-input v-model="listQuery.title" :placeholder="$t('table.title')" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.importance" :placeholder="$t('table.importance')" clearable style="width: 90px" class="filter-item">
@@ -16,6 +35,7 @@
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">{{ $t('table.export') }}</el-button>
       <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">{{ $t('table.reviewer') }}</el-checkbox>
     </div>
+
     <!-- 表格 -->
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border  fit   highlight-current-row  style="width: 100%;" 
      @selection-change="handleSelectionChange"
@@ -55,6 +75,8 @@
     </el-table>
   <!-- 分页 -->
    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+         </el-col>
+</el-row>
     <!-- 点击显示修改密码弹出框 -->
    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
      <el-form ref="dataForm" :rules="rules" :model="user" label-position="left" label-width="70px" style="width: 300px; margin-left:50px;">
@@ -105,10 +127,11 @@
      </div>
    </el-dialog>
   </div>
+
 </template>
 
 <script>
-  import { userList, removeUser, createUser, updatePass,updateStatus } from '@/api/article'  // 引入方法
+  import { userList,menuList, removeUser, createUser, updatePass,updateStatus } from '@/api/article'  // 引入方法
   import waves from '@/directive/waves' // Waves directive
   import { parseTime } from '@/utils'
   //  import { successMsg,errorMsg } from '@/utils/util'
@@ -145,6 +168,39 @@
     },
     data() {
       return {
+        // trees:null,
+        //   [{
+        //   label: '皮皮公司 1',
+
+        //   id: 0,
+        //   children: [{
+        //     id: 1,
+        //     label: '皮皮部门 1-1',
+        //     // children: [{
+        //     //   label: '皮皮部门 1-1-1'
+        //     // }]
+        //   }]
+        // }, {
+        //   label: '皮皮公司 2',
+        //   id: 0,
+        //   children: [{
+        //     id: 1,
+        //     label: '皮皮部门 2-1',
+        //     // children: [{
+        //     //   label: '皮皮部门 2-1-1'
+        //     // }]
+        //   }, {
+        //     id: 1,
+        //     label: '皮皮部门 2-2',
+        //     // children: [{
+        //     //   label: '三级 2-2-1'
+        //     // }]
+        //   }]
+        // }],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        },
         tableKey: 0,
         list: null,
         total: 0,
@@ -215,6 +271,56 @@
             this.listLoading = false
           }, 1.5 * 1000)
         })
+      },
+      handleNodeClick(data) {  // 选择树节点
+        console.log(data);
+      },
+      loadTrees(node, resolve){
+        this.listLoading = true
+        // 如果是顶级的父节点
+        // if (node.level === 0) {
+          // 查找顶级对象
+        menuList(null).then(res => {
+          var nodes = JSON.parse(res.data)
+          console.log(nodes)
+		        for (var i = 0; i < nodes.length; i++) {
+        				if(node.level === 0  && nodes[i].pId === 0 ) {
+        			    return resolve(nodes[i].title);
+        				}
+        			}
+
+
+
+
+
+
+        //   // if (res.Data) {
+        //       return resolve(res)
+        //     // } else {
+        //     //   this.$message.error(res.Msg)
+        //     // }
+        //   }).catch(() => {
+        //     let data = []
+        //     return resolve(data)
+        //   })
+        // } else {
+        //   // 根据父节点id找寻下一级的所有节点 
+        //   typeList(node.data.Id).then(res => {
+        //     if (res.Data) {
+        //       return resolve(res.Data)
+        //     } else {
+        //       this.$message.error(res.Msg)
+        //     }
+        //   }).catch(() => {
+        //     let data = []
+        //     return resolve(data)
+          })   
+          // Just to simulate the time of the request
+          // setTimeout(() => {
+          //   this.listLoading = false
+          // }, 1.5 * 1000)
+    
+        // }
       },
       changeStatus(id,status) { // 改变用户状态
         this.$confirm('确认要更改用户状态?', '系统提示', {
@@ -385,4 +491,5 @@
     }
   }
 </script>
+
 

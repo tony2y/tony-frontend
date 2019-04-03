@@ -136,10 +136,10 @@ export default {
         if (valid) {
           this.loading = true
           // this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
-             loginBack(this.loginForm).then(res => {
+             loginBack(this.loginForm).then(res => { // 后端登录
               if(res.data.status === 200){
                  this.$message.success(res.data.msg);
-                  this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+                  this.$store.dispatch('LoginByUsername', this.loginForm).then(() => { // 前端登录并获取角色信息
                       this.loading = false
                         this.$router.push({
                           path: '/user/index',

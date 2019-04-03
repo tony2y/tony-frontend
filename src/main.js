@@ -18,6 +18,7 @@ import './icons' // icon
 import './errorLog' // error log
 import './permission' // permission control
 import './mock' // simulation data
+import './assets/iconfont/iconfont.css'
 
 import * as filters from './filters' // global filters
 

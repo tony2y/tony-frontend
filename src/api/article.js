@@ -24,6 +24,14 @@ export function userList(query) { // 查询用户
   })
 }
 
+export function menuList(query) { // 菜单权限列表
+  return request({
+    url: 'http://localhost:8081/system/menu/roleMenuTreeData',
+    method: 'get',
+    params: query
+  })
+}
+
 export function updatePass(data) { // 修改密码
   return request({
     url: 'http://localhost:8081/system/user/editPwd',
