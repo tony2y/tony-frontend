@@ -163,6 +163,50 @@ export const constantRoutes = [
     }]
   },
   {
+    path: '/dept',
+    component: Layout,
+    redirect: '/dept/index', // 重定向地址，在面包屑中点击会重定向去的地址
+    // hidden: true, // 不在侧边栏线上
+    alwaysShow: true, // 一直显示根路由
+    meta: {
+      title: 'dept',
+      icon: 'dept' // 图标
+    },
+    // 你可以在根路由设置权限，这样它下面所以的子路由都继承了这个权限
+    children: [{
+      path: 'dept',
+      component: () => import('@/views/dept/index'),
+      name: 'index',
+      meta: {
+        title: 'dept',
+        // role: ['admin', 'editor'], // 或者你可以给每一个子路由设置自己的权限
+        noCache: true // 不会被 <keep-alive> 缓存
+      }
+    }]
+  },
+  {
+    path: '/menu',
+    component: Layout,
+    redirect: '/menu/index', // 重定向地址，在面包屑中点击会重定向去的地址
+    // hidden: true, // 不在侧边栏线上
+    alwaysShow: true, // 一直显示根路由
+    meta: {
+      title: 'menu',
+      icon: 'menu' // 图标
+    },
+    // 你可以在根路由设置权限，这样它下面所以的子路由都继承了这个权限
+    children: [{
+      path: 'menu',
+      component: () => import('@/views/menu/index'),
+      name: 'index',
+      meta: {
+        title: 'menu',
+        // role: ['admin', 'editor'], // 或者你可以给每一个子路由设置自己的权限
+        noCache: true // 不会被 <keep-alive> 缓存
+      }
+    }]
+  },
+  {
     path: '/icon',
     component: Layout,
     children: [

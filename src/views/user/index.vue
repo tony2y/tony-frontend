@@ -5,12 +5,12 @@
       <el-col :span="3">
         公司列表
           <el-tree 
+           :data="trees"
            :props="defaultProps"
            @node-click="handleNodeClick"
-           lazy
-           :load="loadTrees"
            highlight-current
-           default-expand-all>
+           default-expand-all
+           >
         <span class="slot-t-node" slot-scope="{ node, data}">
           <i :class="{ 'iconfont icon-wenjian4': !node.expanded, 'iconfont icon-wenjianjia_f':node.expanded}"/>
           <span>{{ node.label }}</span>
@@ -131,7 +131,7 @@
 </template>
 
 <script>
-  import { userList,menuList, removeUser, createUser, updatePass,updateStatus } from '@/api/article'  // 引入方法
+  import { userList,deptList, removeUser, createUser, updatePass,updateStatus } from '@/api/article'  // 引入方法
   import waves from '@/directive/waves' // Waves directive
   import { parseTime } from '@/utils'
   //  import { successMsg,errorMsg } from '@/utils/util'
@@ -168,38 +168,11 @@
     },
     data() {
       return {
-        // trees:null,
-        //   [{
-        //   label: '皮皮公司 1',
-
-        //   id: 0,
-        //   children: [{
-        //     id: 1,
-        //     label: '皮皮部门 1-1',
-        //     // children: [{
-        //     //   label: '皮皮部门 1-1-1'
-        //     // }]
-        //   }]
-        // }, {
-        //   label: '皮皮公司 2',
-        //   id: 0,
-        //   children: [{
-        //     id: 1,
-        //     label: '皮皮部门 2-1',
-        //     // children: [{
-        //     //   label: '皮皮部门 2-1-1'
-        //     // }]
-        //   }, {
-        //     id: 1,
-        //     label: '皮皮部门 2-2',
-        //     // children: [{
-        //     //   label: '三级 2-2-1'
-        //     // }]
-        //   }]
-        // }],
+        trees:null,
         defaultProps: {
+          id:'id',
           children: 'children',
-          label: 'label'
+          label: 'deptName'
         },
         tableKey: 0,
         list: null,
@@ -258,6 +231,7 @@
     },
     created() {
       this.getList()
+      this.loadTrees()
     },
     methods: {
       getList() {  // 表格内容
@@ -275,52 +249,24 @@
       handleNodeClick(data) {  // 选择树节点
         console.log(data);
       },
-      loadTrees(node, resolve){
+      loadTrees(){
         this.listLoading = true
         // 如果是顶级的父节点
-        // if (node.level === 0) {
-          // 查找顶级对象
-        menuList(null).then(res => {
-          var nodes = JSON.parse(res.data)
-          console.log(nodes)
-		        for (var i = 0; i < nodes.length; i++) {
-        				if(node.level === 0  && nodes[i].pId === 0 ) {
-        			    return resolve(nodes[i].title);
-        				}
-        			}
-
-
-
-
-
-
-        //   // if (res.Data) {
-        //       return resolve(res)
-        //     // } else {
-        //     //   this.$message.error(res.Msg)
-        //     // }
-        //   }).catch(() => {
-        //     let data = []
-        //     return resolve(data)
-        //   })
-        // } else {
-        //   // 根据父节点id找寻下一级的所有节点 
-        //   typeList(node.data.Id).then(res => {
-        //     if (res.Data) {
-        //       return resolve(res.Data)
-        //     } else {
-        //       this.$message.error(res.Msg)
-        //     }
-        //   }).catch(() => {
-        //     let data = []
-        //     return resolve(data)
-          })   
-          // Just to simulate the time of the request
-          // setTimeout(() => {
-          //   this.listLoading = false
-          // }, 1.5 * 1000)
-    
-        // }
+           // 查找顶级对象
+          deptList(null).then(res => {
+            console.log(res.data)
+            this.trees = res.data
+              // return resolve(res.data)
+            // if (node.level === 0) {
+            //   return resolve(res.data)
+            // } else if (node.level === 1) {
+            //   return resolve(res.data)
+            // } else if (node.level === 2) {
+            //   return resolve(res.data)
+            // } else {
+            //   return resolve([])
+            // }
+          })
       },
       changeStatus(id,status) { // 改变用户状态
         this.$confirm('确认要更改用户状态?', '系统提示', {
