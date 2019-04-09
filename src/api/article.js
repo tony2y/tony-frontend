@@ -32,11 +32,18 @@ export function menuList(query) { // 菜单权限列表
   })
 }
 
-export function deptList(query) { // 菜单权限列表
+export function deptList(query) { // 部门列表
   return request({
     url: 'http://localhost:8081/system/dept/tree',
     method: 'get',
     params: query
+  })
+}
+
+export function serverList() { // 服务器列表
+  return request({
+    url: 'http://localhost:8081/system/user/server',
+    method: 'get'
   })
 }
 

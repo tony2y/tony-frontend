@@ -146,8 +146,8 @@ export const constantRoutes = [
     // hidden: true, // 不在侧边栏线上
     alwaysShow: true, // 一直显示根路由
     meta: {
-      title: 'user',
-      roles: ['admin', 'editor'],
+      title: '用户管理',
+      // roles: ['admin', 'editor'],
       icon: 'user' // 图标
     },
     // 你可以在根路由设置权限，这样它下面所以的子路由都继承了这个权限
@@ -156,8 +156,8 @@ export const constantRoutes = [
       component: () => import('@/views/user/index'),
       name: 'index',
       meta: {
-        title: 'user',
-        role: ['admin', 'editor'], // 或者你可以给每一个子路由设置自己的权限
+        title: '用户列表',
+        // role: ['admin', 'editor'], // 或者你可以给每一个子路由设置自己的权限
         noCache: true // 不会被 <keep-alive> 缓存
       }
     }]
@@ -169,8 +169,8 @@ export const constantRoutes = [
     // hidden: true, // 不在侧边栏线上
     alwaysShow: true, // 一直显示根路由
     meta: {
-      title: 'dept',
-      icon: 'dept' // 图标
+      title: '部门管理',
+      icon: 'component' // 图标
     },
     // 你可以在根路由设置权限，这样它下面所以的子路由都继承了这个权限
     children: [{
@@ -178,7 +178,7 @@ export const constantRoutes = [
       component: () => import('@/views/dept/index'),
       name: 'index',
       meta: {
-        title: 'dept',
+        title: '部门列表',
         // role: ['admin', 'editor'], // 或者你可以给每一个子路由设置自己的权限
         noCache: true // 不会被 <keep-alive> 缓存
       }
@@ -191,8 +191,8 @@ export const constantRoutes = [
     // hidden: true, // 不在侧边栏线上
     alwaysShow: true, // 一直显示根路由
     meta: {
-      title: 'menu',
-      icon: 'menu' // 图标
+      title: '菜单管理',
+      icon: 'component' // 图标
     },
     // 你可以在根路由设置权限，这样它下面所以的子路由都继承了这个权限
     children: [{
@@ -200,7 +200,29 @@ export const constantRoutes = [
       component: () => import('@/views/menu/index'),
       name: 'index',
       meta: {
-        title: 'menu',
+        title: '菜单列表',
+        // role: ['admin', 'editor'], // 或者你可以给每一个子路由设置自己的权限
+        noCache: true // 不会被 <keep-alive> 缓存
+      }
+    }]
+  },
+  {
+    path: '/server',
+    component: Layout,
+    redirect: '/server/index', // 重定向地址，在面包屑中点击会重定向去的地址
+    // hidden: true, // 不在侧边栏线上
+    alwaysShow: true, // 一直显示根路由
+    meta: {
+      title: '服务器状态',
+      icon: 'component' // 图标
+    },
+    // 你可以在根路由设置权限，这样它下面所以的子路由都继承了这个权限
+    children: [{
+      path: 'server',
+      component: () => import('@/views/server/index'),
+      name: 'index',
+      meta: {
+        title: '服务器监控',
         // role: ['admin', 'editor'], // 或者你可以给每一个子路由设置自己的权限
         noCache: true // 不会被 <keep-alive> 缓存
       }

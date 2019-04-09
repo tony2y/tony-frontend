@@ -5,8 +5,10 @@
       <el-col :span="3">
         公司列表
           <el-tree 
-           :data="trees"
-           :props="defaultProps"
+           :data="depts"
+           :props="deptProps"
+           v-loading="deptLoading"
+           element-loading-text="加载中"
            @node-click="handleNodeClick"
            highlight-current
            default-expand-all
@@ -20,29 +22,40 @@
       <el-col :span="20">
         <el-col :span="1"><div style="background: #99a9bf;"></div></el-col>
     <div class="filter-container">
-      <el-input v-model="listQuery.title" :placeholder="$t('table.title')" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.importance" :placeholder="$t('table.importance')" clearable style="width: 90px" class="filter-item">
+      <el-input style="width: 200px;" class="filter-item" placeholder="选择权限" @click.native="loadRoles"  />
+      <el-input v-model="listQuery.userName" placeholder="账号" style="width: 200px;" class="filter-item"  />
+      <el-input v-model="listQuery.phone" placeholder="手机号码" style="width: 200px;" class="filter-item" />
+      <!-- <el-select v-model="listQuery.importance" :placeholder="$t('table.importance')" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-select v-model="listQuery.type" :placeholder="$t('table.type')" clearable class="filter-item" style="width: 130px">
+      </el-select> -->
+      <!-- <el-select v-model="listQuery.type" :placeholder="$t('table.type')" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      </el-select> -->
+      <el-select v-model="listQuery.status" style="width: 140px" class="filter-item" >
+        <el-option v-for="item in statusList" :key="item.key" :label="item.label" :value="item.key" />
       </el-select>
-      <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
+      <el-date-picker
+        class="filter-item" 
+        v-model="listQuery.created"
+        type="datetimerange"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期">
+      </el-date-picker>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">{{ $t('table.export') }}</el-button>
-      <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">{{ $t('table.reviewer') }}</el-checkbox>
+      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">{{ $t('table.reviewer') }}</el-checkbox> -->
     </div>
 
     <!-- 表格 -->
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border  fit   highlight-current-row  style="width: 100%;" 
+     element-loading-text="加载中"
      @selection-change="handleSelectionChange"
-     @sort-change="sortChange">
+     >
     <!-- 数据栏 -->
       <el-table-column type="selection"  width="55"> </el-table-column>
-      <el-table-column label="ID" prop="userId" sortable="custom" align="center" ></el-table-column>
+      <el-table-column label="编号" prop="userId"  align="center" ></el-table-column>
       <el-table-column label="登录账号" prop="userName" align="center"></el-table-column>
       <el-table-column label="手机" prop="phone" ></el-table-column>
       <el-table-column label="创建时间" prop="created"  align="center"></el-table-column>
@@ -104,7 +117,7 @@
 
 
        <!-- 点击显示新增用户弹出框 -->
-   <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormAddVisible" width="30%">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormAddVisible" width="30%">
      <el-form ref="dataFormAdd" :rules="rules" :model="adds" label-position="left" label-width="70px" style="width: 300px; margin-left:50px;">
 
       <el-form-item label="用户名" prop="userName">
@@ -120,10 +133,52 @@
        </el-form-item>
 
      </el-form>
+
+   
      <!-- 确认取消按钮 -->
      <div slot="footer" class="dialog-footer">
        <el-button @click="dialogFormAddVisible = false">取消</el-button>
        <el-button type="primary" @click="createData()">确认</el-button>
+     </div>
+   </el-dialog>
+
+
+          <!-- 点击显示权限列表弹出框 -->
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogRoleVisible" width="30%">
+     <!-- <el-form  :model="roles" label-position="left" label-width="70px" style="width: 300px; margin-left:50px;"> -->
+       <el-input
+          style="width: 200px;"
+          placeholder="输入关键字查找"
+          v-model="filterText">
+      </el-input>
+      <el-col>
+        <!-- 权限列表 -->
+          <el-tree 
+           class="filter-tree"
+           :data="roles"
+           :props="rolesProps"
+           ref="role"
+           v-loading="roleLoading"
+           element-loading-text="加载中"
+           :filter-node-method="filterNode"
+           @node-click="handleRoleNodeClick"
+           highlight-current
+           default-expand-all
+           show-checkbox
+           >
+        <span class="slot-t-node" slot-scope="{ node, data}">
+          <i :class="{ 'iconfont icon-wenjian4': !node.expanded, 'iconfont icon-wenjianjia_f':node.expanded}"/>
+          <span>{{ node.label }}</span>  
+        </span>
+          </el-tree>
+      </el-col>
+     <!-- </el-form> -->
+
+   
+     <!-- 确认取消按钮 -->
+     <div slot="footer" class="dialog-footer">
+       <el-button @click="dialogRoleVisible = false">取消</el-button>
+       <el-button type="primary" @click="selectRoles()">确认</el-button>
      </div>
    </el-dialog>
   </div>
@@ -131,7 +186,7 @@
 </template>
 
 <script>
-  import { userList,deptList, removeUser, createUser, updatePass,updateStatus } from '@/api/article'  // 引入方法
+  import { userList,menuList,deptList, removeUser, createUser, updatePass,updateStatus } from '@/api/article'  // 引入方法
   import waves from '@/directive/waves' // Waves directive
   import { parseTime } from '@/utils'
   //  import { successMsg,errorMsg } from '@/utils/util'
@@ -168,23 +223,32 @@
     },
     data() {
       return {
-        trees:null,
-        defaultProps: {
+        filterText: '',
+        depts:null,
+        roles:null,
+       deptProps: {
           id:'id',
           children: 'children',
           label: 'deptName'
         },
+        rolesProps: {
+          id:'id',
+          children: 'children',
+          label: 'permName'
+        },
         tableKey: 0,
         list: null,
         total: 0,
-        listLoading: true,
+        listLoading: true,  // 表格加载
+        roleLoading: true,  // 权限加载
+        deptLoading: true,  // 部门加载
         listQuery: {
           page: 1,
           limit: 10,
-          importance: undefined,
-          title: undefined,
-          type: undefined,
-          // sort: '+id'
+          userName: null,
+          phone: null,
+          created: null,
+          status:null
         },
         adds:{
           userName:null,
@@ -198,7 +262,7 @@
         },
         importanceOptions: [1, 2, 3],
         calendarTypeOptions,
-        sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
+        statusList: [{ label: '正常', key: 0 }, { label: '禁用', key: 1 }],
         statusOptions: ['published', 'draft', 'deleted'],
         showReviewer: false,
         // temp: {
@@ -212,10 +276,12 @@
         // },
         dialogFormVisible: false,     // 弹出框(修改密码)
         dialogFormAddVisible:false,  // 弹出框(新增)
+        dialogRoleVisible:false,     // 权限列表
         dialogStatus: '',
         textMap: {
           update: '修改密码',
-          create: '新增用户'
+          create: '新增用户',
+          roles:  '选择权限'
         },
         dialogPvVisible: false,
         pvData: [],
@@ -229,9 +295,14 @@
         downloadLoading: false
       }
     },
+    watch: {
+      filterText(val) {
+        this.$refs.role.filter(val);
+      }
+    },
     created() {
       this.getList()
-      this.loadTrees()
+      this.loadDepts()
     },
     methods: {
       getList() {  // 表格内容
@@ -246,26 +317,45 @@
           }, 1.5 * 1000)
         })
       },
-      handleNodeClick(data) {  // 选择树节点
+      handleNodeClick(data) {  // 选择部门树节点
         console.log(data);
       },
-      loadTrees(){
-        this.listLoading = true
+      handleRoleNodeClick(data) {  // 选择权限树节点
+        this.$message.success(data.id+"");
+      },
+      selectRoles(){   // 选择的权限集合
+        this.dialogRoleVisible = false
+        console.log(this.$refs.role.getCheckedNodes())
+        // this.$message.success(this.$refs.role.getCheckedNodes());
+      },
+      filterNode(value, data) {  // 根据关键字过滤树权限列表
+        if (!value) return true;
+        return data.permName.indexOf(value) !== -1;
+      },
+      loadDepts(){      //  加载部门列表
+        this.deptLoading = true
         // 如果是顶级的父节点
-           // 查找顶级对象
           deptList(null).then(res => {
-            console.log(res.data)
-            this.trees = res.data
-              // return resolve(res.data)
-            // if (node.level === 0) {
-            //   return resolve(res.data)
-            // } else if (node.level === 1) {
-            //   return resolve(res.data)
-            // } else if (node.level === 2) {
-            //   return resolve(res.data)
-            // } else {
-            //   return resolve([])
+            // if (res.data.data.status === 200) {
+              this.depts = res.data
             // }
+
+        setTimeout(() => {
+          this.deptLoading = false
+        }, 1.5 * 1000)
+          })
+      },
+      loadRoles(){     // 加载权限树列表
+          this.roleLoading = true
+             // this.resetTemp()
+        this.dialogStatus = 'roles'
+        this.dialogRoleVisible = true
+          menuList(null).then(res => {
+            this.roles = res.data
+            
+          setTimeout(() => {
+          this.roleLoading = false
+        }, 1.5 * 1000)
           })
       },
       changeStatus(id,status) { // 改变用户状态
@@ -289,22 +379,22 @@
         this.multipleSelection = val;
       },
       handleFilter() {  // 搜索按钮
-        this.listQuery.page = 1
+        // this.listQuery.page = 1
         this.getList()
       },
       filterTag(value, row) {
         return row.status === value;
       },
       handleModifyStatus(id) {  // 删除按钮
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           removeUser(id).then(res => {
           if(res.data.status === 200){
-              this.$message.success(res.data.msg);
-               this.getList()
+               this.$message.success(res.data.msg);
+               this.getList()  // 删除成功返回列表
               }else{
                 this.$message.error(res.data.msg); 
               }
@@ -316,32 +406,22 @@
         //   });          
         });
       },
-      sortChange(data) {  // 编号排序
-        const { prop, order } = data
-        if (prop === 'id') {
-          this.sortByID(order)
-        }
-      },
-      sortByID(order) {  // 编号排序
-        if (order === 'ascending') {
-          this.listQuery.sort = '+id'
-        } else {
-          this.listQuery.sort = '-id'
-        }
-        this.handleFilter()
-      },
-      // resetTemp() {
-      //   this.temp = {
-      //     id: undefined,
-      //     importance: 1,
-      //     remark: '',
-      //     timestamp: new Date(),
-      //     title: '',
-      //     status: 'published',
-      //     type: ''
+      // sortChange(data) {  // 编号排序
+      //   const { prop, order } = data
+      //   if (prop === 'userId') {
+      //     this.sortByID(order)
       //   }
       // },
-      handleCreate() {  // 新增按钮
+      // sortByID(order) {  // 编号排序
+      // console.log(order)
+      //   if (order === 'ascending') {
+      //     this.listQuery.sort = '+userId'
+      //   } else {
+      //     this.listQuery.sort = '-userId'
+      //   }
+      //   this.handleFilter()
+      // },
+      handleCreate() {  // 新增用户按钮
         // this.resetTemp()
         this.dialogStatus = 'create'
         this.dialogFormAddVisible = true

@@ -34,8 +34,13 @@
     highlight-current
     >
       <template slot="menuType" slot-scope="{scope}">
-        <el-tag>level: {{ scope.row._level }}</el-tag>
-      
+        <el-tag class="el-tag--info" v-if="scope.row._level === 0 ">目录</el-tag>
+        <el-tag class="el-tag--success" v-if="scope.row._level === 1 ">菜单</el-tag>
+        <el-tag class="el-tag--warning" v-if="scope.row._level === 2 ">按钮</el-tag>
+      </template>
+       <template slot="status" slot-scope="{scope}">
+        <el-tag class="el-tag--primary" v-if="scope.row.status === 1 " >显示</el-tag>
+        <el-tag class="el-tag--danger" v-if="scope.row.status === 2 " >隐藏</el-tag>
       </template>
       <template slot="operation" slot-scope="{scope}">
         <el-button type="primary" size="" @click="click(scope)">Click</el-button>
@@ -83,6 +88,10 @@ export default {
         {
           label: '类型',
           key: 'menuType'
+        },
+        {
+          label: '状态',
+          key: 'status'
         },
         {
           label: '权限标识',
