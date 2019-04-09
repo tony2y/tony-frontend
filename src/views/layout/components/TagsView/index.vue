@@ -203,7 +203,7 @@ export default {
       cursor: pointer;
       height: 26px;
       line-height: 26px;
-      border: 1px solid #d8dce5;
+      border: 1px solid rgba(255,255,255,.5);
       color: #495060;
       background: #fff;
       padding: 0 8px;
@@ -216,20 +216,24 @@ export default {
       &:last-of-type {
         margin-right: 15px;
       }
+      &:hover {
+        color: #2ec4b6;
+      }
       &.active {
-        background-color: #42b983;
-        color: #fff;
-        border-color: #42b983;
-        &::before {
-          content: '';
-          background: #fff;
-          display: inline-block;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          position: relative;
-          margin-right: 2px;
-        }
+        background-color: rgba(255,255,255,.5);
+        color: #2ec4b6;
+        border-color: rgba(255,255,255,.5);
+        border-bottom: solid 2px;
+        // &::before {
+        //   content: '';
+        //   background: #fff;
+        //   display: inline-block;
+        //   width: 8px;
+        //   height: 8px;
+        //   border-radius: 50%;
+        //   position: relative;
+        //   margin-right: 2px;
+        // }
       }
     }
   }
