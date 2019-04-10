@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="title-container">
         <h3 class="title">
-        系统登录
+          系统登录
         </h3>
         <lang-select class="set-language" />
       </div>
@@ -39,7 +39,7 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
-     登录
+        登录
       </el-button>
 
       <!-- <div style="position:relative">
@@ -71,17 +71,12 @@
 </template>
 
 <script>
-import { loginBack } from '@/api/article'  // 引入方法
-import { validUsername } from '@/utils/validate'
-import LangSelect from '@/components/LangSelect'
-import SocialSign from './socialsignin'
-
+import { loginBack } from '@/api/article' // 引入方法
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (value == null) {
         callback(new Error('请输入正确的用户名'))
       } else {
         callback()
@@ -136,27 +131,27 @@ export default {
         if (valid) {
           this.loading = true
           // this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
-             loginBack(this.loginForm).then(res => { // 后端登录
-              if(res.data.status === 200){
-                 this.$message.success(res.data.msg);
-                  this.$store.dispatch('LoginByUsername', this.loginForm).then(() => { // 前端登录并获取角色信息
-                      this.loading = false
-                        this.$router.push({
-                          path: '/user/index',
-                          // redirect: '/user/index', 
-                          // path: this.redirect
-                          })
-                      }).catch(() => {
-                          this.loading = false
-                        })
-                      }
-                      else{
-                      this.$message.error(res.data.msg);
-                      this.loading = false
-                    }
+          loginBack(this.loginForm).then(res => { // 后端登录
+            if (res.data.status === 200) {
+              this.$message.success(res.data.msg)
+              this.$store.dispatch('LoginByUsername', this.loginForm).then(() => { // 前端登录并获取角色信息
+                this.loading = false
+                this.$store.dispatch('setLanguage', 'zh')
+                this.$router.push({
+                  path: '/user/index'
+                  // redirect: '/user/index',
+                  // path: this.redirect
+                })
+              }).catch(() => {
+                this.loading = false
               })
-          }
-       })
+            } else {
+              this.$message.error(res.data.msg)
+              this.loading = false
+            }
+          })
+        }
+      })
     },
     afterQRScan() {
       // const hash = window.location.hash.slice(1)

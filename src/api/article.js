@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-
+var rqeUrl = 'http://localhost:8081'
 export function fetchList(query) {
   return request({
     url: '/article/list',
@@ -10,7 +10,7 @@ export function fetchList(query) {
 
 export function loginBack(data) { // 登录
   return request({
-    url: 'http://localhost:8081/loginIn',
+    url: rqeUrl + '/loginIn',
     method: 'get',
     params: data
   })
@@ -18,7 +18,7 @@ export function loginBack(data) { // 登录
 
 export function userList(query) { // 查询用户
   return request({
-    url: 'http://localhost:8081/system/user/list',
+    url: rqeUrl + '/system/user/list',
     method: 'get',
     params: query
   })
@@ -26,7 +26,7 @@ export function userList(query) { // 查询用户
 
 export function menuList(query) { // 菜单权限列表
   return request({
-    url: 'http://localhost:8081/system/menu/tree',
+    url: rqeUrl + '/system/menu/tree',
     method: 'get',
     params: query
   })
@@ -34,7 +34,7 @@ export function menuList(query) { // 菜单权限列表
 
 export function deptList(query) { // 部门列表
   return request({
-    url: 'http://localhost:8081/system/dept/tree',
+    url: rqeUrl + '/system/dept/tree',
     method: 'get',
     params: query
   })
@@ -42,14 +42,14 @@ export function deptList(query) { // 部门列表
 
 export function serverList() { // 服务器列表
   return request({
-    url: 'http://localhost:8081/system/user/server',
+    url: rqeUrl + '/system/user/server',
     method: 'get'
   })
 }
 
 export function updatePass(data) { // 修改密码
   return request({
-    url: 'http://localhost:8081/system/user/editPwd',
+    url: rqeUrl + '/system/user/editPwd',
     method: 'post',
     params: data
   })
@@ -57,7 +57,7 @@ export function updatePass(data) { // 修改密码
 
 export function updateStatus(data) { // 更改状态
   return request({
-    url: 'http://localhost:8081/system/user/updateStatus',
+    url: rqeUrl + '/system/user/updateStatus',
     method: 'put',
     params: data
   })
@@ -65,7 +65,7 @@ export function updateStatus(data) { // 更改状态
 
 export function createUser(data) { // 新增用户
   return request({
-    url: 'http://localhost:8081/system/user/add',
+    url: rqeUrl + '/system/user/add',
     method: 'post',
     params: data
   })
@@ -73,8 +73,20 @@ export function createUser(data) { // 新增用户
 
 export function removeUser(id) { // 删除用户
   return request({
-    url: 'http://localhost:8081/system/user/remove/' + id,
+    url: rqeUrl + '/system/user/remove/' + id,
     method: 'delete'
+  })
+}
+
+export function druid() { // 数据监控
+  return request({
+    url: rqeUrl + '/druid/index.html'
+  })
+}
+
+export function swagger() { // 接口文档
+  return request({
+    url: rqeUrl + '/swagger-ui.html'
   })
 }
 

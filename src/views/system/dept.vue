@@ -24,24 +24,20 @@
 
     </div>
 
-    <tree-table 
-    :key="key" 
-    :default-expand-all="defaultExpandAll" 
-    :data="datas"
-    :columns="columns"
-    :props="defaultProps"
-    border
-    highlight-current
+    <tree-table
+      :key="key"
+      :default-expand-all="defaultExpandAll"
+      :data="datas"
+      :columns="columns"
+      :props="defaultProps"
+      border
+      highlight-current
     >
-      <template slot="menuType" slot-scope="{scope}">
-        <el-tag class="el-tag--info" v-if="scope.row._level === 0 ">目录</el-tag>
-        <el-tag class="el-tag--success" v-if="scope.row._level === 1 ">菜单</el-tag>
-        <el-tag class="el-tag--warning" v-if="scope.row._level === 2 ">按钮</el-tag>
-      </template>
-       <template slot="status" slot-scope="{scope}">
-        <el-tag class="el-tag--primary" v-if="scope.row.status === 1 " >显示</el-tag>
-        <el-tag class="el-tag--danger" v-if="scope.row.status === 2 " >隐藏</el-tag>
-      </template>
+      <!-- <template slot="scope" slot-scope="{scope}">
+        <el-tag>level: {{ scope.row._level }}</el-tag>
+        <el-tag>expand: {{ scope.row._expand }}</el-tag>
+        <el-tag>select: {{ scope.row._select }}</el-tag>
+      </template> -->
       <template slot="operation" slot-scope="{scope}">
         <el-button type="primary" size="" @click="click(scope)">Click</el-button>
       </template>
@@ -52,7 +48,7 @@
 
 <script>
 import treeTable from '@/components/TreeTable'
-import { menuList } from '@/api/article'  // 引入方法
+import { deptList } from '@/api/article' // 引入方法
 
 export default {
   name: 'TreeTableDemo',
@@ -62,10 +58,10 @@ export default {
       defaultExpandAll: true,
       showCheckbox: true,
       defaultProps: {
-        children: 'children',
+        children: 'children'
       },
       key: 1,
-      
+
       columns: [
         // {
         //   label: '',
@@ -73,36 +69,24 @@ export default {
         //   redio: true
         // },
         {
-          label: '菜单名称',
-          key: 'permName',
-          expand: true,
-        },
-        {
-          label: '路径',
-          key: 'url'
+          label: '公司名称',
+          key: 'deptName',
+          expand: true
         },
         {
           label: '排序',
           key: 'orderNum'
         },
         {
-          label: '类型',
-          key: 'menuType'
-        },
-        {
-          label: '状态',
-          key: 'status'
-        },
-        {
-          label: '权限标识',
-          key: 'perms'
+          label: '创建时间',
+          key: 'created'
         },
         {
           label: '操作',
           key: 'operation'
         }
       ],
-     datas: null,
+      datas: null
     }
   },
   watch: {
@@ -118,19 +102,19 @@ export default {
       this.reset()
     }
   },
-  created(){
-   this.loadTrees()
+  created() {
+    this.loadTrees()
   },
   methods: {
-    loadTrees(){
-        this.listLoading = true
-        // 如果是顶级的父节点
-           // 查找顶级对象
-          menuList(null).then(res => {
-            console.log(res.data)
-            this.datas = res.data
-          })
-      },
+    loadTrees() {
+      this.listLoading = true
+      // 如果是顶级的父节点
+      // 查找顶级对象
+      deptList(null).then(res => {
+        console.log(res.data)
+        this.datas = res.data
+      })
+    },
     reset() {
       ++this.key
     },

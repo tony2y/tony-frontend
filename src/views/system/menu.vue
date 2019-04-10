@@ -3,12 +3,8 @@
 
     <div style="margin-bottom:20px;">
 
-      <el-button type="primary" size="small" class="option-item">
-        <a href="https://github.com/PanJiaChen/vue-element-admin/tree/master/src/components/TreeTable" target="_blank">Documentation</a>
-      </el-button>
-
       <div class="option-item">
-        <el-tag>Expand All</el-tag>
+        <el-tag>展开/折叠</el-tag>
         <el-switch
           v-model="defaultExpandAll"
           active-color="#13ce66"
@@ -18,7 +14,7 @@
       </div>
 
       <div class="option-item">
-        <el-tag>Show Checkbox</el-tag>
+        <el-tag>复选框</el-tag>
         <el-switch
           v-model="showCheckbox"
           active-color="#13ce66"
@@ -28,11 +24,23 @@
 
     </div>
 
-    <tree-table :key="key" :default-expand-all="defaultExpandAll" :data="data" :columns="columns" border>
-      <template slot="scope" slot-scope="{scope}">
-        <el-tag>level: {{ scope.row._level }}</el-tag>
-        <el-tag>expand: {{ scope.row._expand }}</el-tag>
-        <el-tag>select: {{ scope.row._select }}</el-tag>
+    <tree-table
+      :key="key"
+      :default-expand-all="defaultExpandAll"
+      :data="datas"
+      :columns="columns"
+      :props="defaultProps"
+      border
+      highlight-current
+    >
+      <template slot="menuType" slot-scope="{scope}">
+        <el-tag v-if="scope.row._level === 0 " class="el-tag--info">目录</el-tag>
+        <el-tag v-if="scope.row._level === 1 " class="el-tag--success">菜单</el-tag>
+        <el-tag v-if="scope.row._level === 2 " class="el-tag--warning">按钮</el-tag>
+      </template>
+      <template slot="status" slot-scope="{scope}">
+        <el-tag v-if="scope.row.status === 1 " class="el-tag--primary">显示</el-tag>
+        <el-tag v-if="scope.row.status === 2 " class="el-tag--danger">隐藏</el-tag>
       </template>
       <template slot="operation" slot-scope="{scope}">
         <el-button type="primary" size="" @click="click(scope)">Click</el-button>
@@ -44,42 +52,57 @@
 
 <script>
 import treeTable from '@/components/TreeTable'
-import data from './data'
+import { menuList } from '@/api/article' // 引入方法
 
 export default {
   name: 'TreeTableDemo',
   components: { treeTable },
   data() {
     return {
-      defaultExpandAll: false,
+      defaultExpandAll: true,
       showCheckbox: true,
+      defaultProps: {
+        children: 'children'
+      },
       key: 1,
+
       columns: [
+        // {
+        //   label: '',
+        //   width:80,
+        //   redio: true
+        // },
         {
-          label: 'Checkbox',
-          checkbox: true
-        },
-        {
-          label: '',
-          key: 'id',
+          label: '菜单名称',
+          key: 'permName',
           expand: true
         },
         {
-          label: 'Event',
-          key: 'event',
-          width: 200,
-          align: 'left'
+          label: '路径',
+          key: 'url'
         },
         {
-          label: 'Scope',
-          key: 'scope'
+          label: '排序',
+          key: 'orderNum'
         },
         {
-          label: 'Operation',
+          label: '类型',
+          key: 'menuType'
+        },
+        {
+          label: '状态',
+          key: 'status'
+        },
+        {
+          label: '权限标识',
+          key: 'perms'
+        },
+        {
+          label: '操作',
           key: 'operation'
         }
       ],
-      data: data
+      datas: null
     }
   },
   watch: {
@@ -95,7 +118,19 @@ export default {
       this.reset()
     }
   },
+  created() {
+    this.loadTrees()
+  },
   methods: {
+    loadTrees() {
+      this.listLoading = true
+      // 如果是顶级的父节点
+      // 查找顶级对象
+      menuList(null).then(res => {
+        console.log(res.data)
+        this.datas = res.data
+      })
+    },
     reset() {
       ++this.key
     },
