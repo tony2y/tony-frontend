@@ -5,7 +5,7 @@
         <h3 class="title">
           系统登录
         </h3>
-        <lang-select class="set-language" />
+        <!-- <lang-select class="set-language" /> -->
       </div>
 
       <el-form-item prop="username">
@@ -136,12 +136,7 @@ export default {
               this.$message.success(res.data.msg)
               this.$store.dispatch('LoginByUsername', this.loginForm).then(() => { // 前端登录并获取角色信息
                 this.loading = false
-                this.$store.dispatch('setLanguage', 'zh')
-                this.$router.push({
-                  path: '/user/index'
-                  // redirect: '/user/index',
-                  // path: this.redirect
-                })
+                this.$router.push({ path: '/' })
               }).catch(() => {
                 this.loading = false
               })
@@ -149,6 +144,12 @@ export default {
               this.$message.error(res.data.msg)
               this.loading = false
             }
+          })
+          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => { // 前端登录并获取角色信息
+            this.loading = false
+            this.$router.push({ path: '/' })
+          }).catch(() => {
+            this.loading = false
           })
         }
       })
